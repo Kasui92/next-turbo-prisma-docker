@@ -1,0 +1,38 @@
+
+services:
+
+  database:
+    image: postgres:13.3
+    container_name: database-dev
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_DB: postgres
+      POSTGRES_HOST: database
+      POSTGRES_PORT: 5432
+      POSTGRES_HOST_AUTH_METHOD: trust
+    ports:
+      - "5432:5432"
+    volumes:
+      - database-data:/var/lib/postgresql/data
+
+  client:
+    container_name: client-dev
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      args:
+        NODEJS_VERSION: 22.13.1
+        POSTGRES_USER: postgres
+        POSTGRES_DB: postgres
+        POSTGRES_HOST: database
+        POSTGRES_PORT: 5432
+    restart: always
+    ports:
+      - "3000:3000"
+      - "5555:5555"
+    volumes:
+      - .:/src
+
+volumes:
+  database-data:
